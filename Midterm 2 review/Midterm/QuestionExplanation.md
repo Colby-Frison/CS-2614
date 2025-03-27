@@ -80,6 +80,7 @@ To determine the ROM size, we need to calculate:
 1. Number of addressable locations = 2³ = 8 (since we have 3 input bits)
 2. Number of bits per location = 3 (since we need 3 output bits for the Gray code)
 3. Total ROM size = 8 × 3 = 24 bits
+(it is also just the height and width of the outputs, but its better to think of it in the proper way)
 
 **Explanation of ROM Size**:
 - The ROM needs enough addresses to store all possible input combinations
@@ -172,8 +173,8 @@ The question asks to fill in the truth table for outputs X and Y of a circuit co
 
 1. **Components**:
    - 3×8 decoder with inputs a, b, c (where a is MSB, c is LSB)
-   - OR gate for output X
-   - AND gate for output Y
+   - OR gate for output X (connected to D₀-D₃ and D₇)
+   - NAND gate for output Y (connected to D₄-D₆)
    - Decoder outputs D₀ through D₇
 
 2. **Decoder Operation**:
@@ -183,8 +184,8 @@ The question asks to fill in the truth table for outputs X and Y of a circuit co
    - Output Dᵢ is active when abc = i in binary
 
 3. **Output Functions**:
-   - X is connected to multiple decoder outputs through an OR gate
-   - Y is connected to some decoder outputs through an AND gate
+   - X is connected to D₀, D₁, D₂, D₃, and D₇ through an OR gate
+   - Y is connected to D₄, D₅, and D₆ through a NAND gate
 
 ### Truth Table Solution:
 ```
@@ -196,29 +197,28 @@ A  B  C  | X  Y
 1  0  0  | 0  1
 1  0  1  | 0  1
 1  1  0  | 0  1
-1  1  1  | 0  1
+1  1  1  | 1  1
 ```
 
 ### Explanation of Outputs
 
 1. **For Output X**:
-   - X is 1 when abc represents 0-3 (000 to 011)
-   - X is 0 when abc represents 4-7 (100 to 111)
-   - This means X = NOT(A) (X is the complement of the MSB)
-   - This happens because the OR gate is connected to D₀, D₁, D₂, and D₃
+   - X is connected to D₀-D₃ and D₇ through an OR gate
+   - X will be 1 when any of these decoder outputs is active
+   - This occurs when abc represents 0-3 (000 to 011) or 7 (111)
+   - X will be 0 only when D₄, D₅, or D₆ is active (abc = 100, 101, or 110)
 
 2. **For Output Y**:
-   - Y is always 1 for all input combinations
-   - This means either:
-     * The AND gate is connected to a single decoder output that's always 1
-     * Or the AND gate has only one input connected to a constant 1
-   - Since decoder outputs can't be always 1, Y must be connected to a constant 1
+   - Y is connected to D₄, D₅, and D₆ through a NAND gate
+   - Since the decoder only activates one output at a time, at least two inputs to the NAND gate will always be 0
+   - When any input to a NAND gate is 0, the output is 1
+   - Therefore, Y is always 1 for all input combinations
 
 ### Key Points:
 - The decoder activates exactly one output line for each input combination
-- The OR gate for X effectively checks if the input is less than 4 (NOT A)
-- The Y output is constant 1, likely due to the AND gate being connected to a constant 1
-- Understanding the decoder's operation is crucial for determining which outputs are active for each input combination
+- The OR gate for X produces 1 for inputs 0-3 and 7
+- The NAND gate for Y always produces 1 due to decoder behavior
+- Understanding how the decoder outputs connect to the OR and NAND gates is crucial for determining the final outputs
 
 ## Question 5: 4-bit Arithmetic Circuit Analysis [15 marks]
 
@@ -261,22 +261,27 @@ The question presents a 4-bit arithmetic circuit with two registers A and B, and
 ### Operation Determination
 
 1. **Result Analysis**:
-   - The circuit performs A-1+1 = A when S₁S₀ = 11 and Cᵢₙ = 1
-   - This is effectively a transfer operation from register A to the output
+   - When S₁S₀ = 11, all MUX outputs are 1 (X inputs to FAs)
+   - For each FA:
+     * X input is 1 (from MUX)
+     * Y input is 1 (from previous carry)
+     * These 1s add to give 10 (carry of 1 to next stage)
+   - This carry chain effectively cancels out, leaving only A's value
+   - Therefore, the circuit performs a transfer of register A to the output
 
 2. **Why it's a Transfer**:
-   - The MUXes select constant 1s
-   - The carry chain through FAs effectively cancels out
-   - The final result is the value from register A
-   - The operation A-1+1 simplifies to just A
+   - The carry propagation is key: 1 + 1 = 0 (with carry 1)
+   - This carry of 1 becomes the Y input for the next stage
+   - The process repeats at each FA, preserving A's bits
+   - The final result is identical to the contents of register A
 
 ### Answer: Transfer
 
 The circuit performs a transfer operation when S₁ = 1, S₀ = 1, Cᵢₙ = 1 because:
-- The MUX selection puts 1s into all FA X inputs
-- The carry chain and initial Cᵢₙ = 1 cancel out the effect of these 1s
-- The final output is identical to the contents of register A
-- This matches with the red marking showing "A-1+1 = A" and the answer "Transfer"
+- The carry propagation is key: 1 + 1 = 0 (with carry 1)
+- This carry of 1 becomes the Y input for the next stage
+- The process repeats at each FA, preserving A's bits
+- The final result is identical to the contents of register A
 
 ## Common Arithmetic Operations in Digital Circuits
 
