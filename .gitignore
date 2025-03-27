@@ -1,0 +1,16 @@
+# Ignore practice exam PDF
+practiceExam.pdf
+
+# Common files to ignore
+*.pdf
+*.class
+*.o
+*.exe
+*.log
+.DS_Store
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*~ 
