@@ -132,6 +132,32 @@ Since we can't do division in assembly, we'll:
    * Add 48 to get ASCII value
    * Use OUT to display
 
+### Outputting Multi-Digit Numbers
+When we need to display a number that's more than one digit, we need to:
+1. Split the number into its digits
+   - For a two-digit number:
+     * Keep subtracting 10 until we can't anymore
+     * Count how many times we subtracted (this is the tens digit)
+     * What's left is the ones digit
+2. Convert each digit to ASCII
+   - Add 48 (ASCII '0') to each digit
+3. Output the digits in order
+   - First output the tens digit
+   - Then output the ones digit
+
+Example for number 25:
+1. Split into digits:
+   - Subtract 10 twice (tens digit = 2)
+   - Remainder is 5 (ones digit)
+2. Convert to ASCII:
+   - 2 + 48 = 50 (ASCII '2')
+   - 5 + 48 = 53 (ASCII '5')
+3. Output:
+   - First OUT displays '2'
+   - Second OUT displays '5'
+
+This same approach can be extended for larger numbers by subtracting 100 for hundreds digit, etc.
+
 ## 5. Program Organization
 
 The program will be organized in this order:

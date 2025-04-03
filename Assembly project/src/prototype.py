@@ -6,6 +6,38 @@ sum = 0          # DEC 0
 counter = 1      # DEC 1
 temp = 0         # DEC 0 (for storing temporary values)
 
+def split_number(n):
+    """
+    Splits a number into its individual digits using repeated subtraction.
+    This simulates how we'll do it in assembly without division.
+    
+    In assembly:
+    - We'll use LDA to load the number
+    - Repeatedly subtract 10 using ADD with -10
+    - Count how many times we can subtract (tens digit)
+    - What's left is the ones digit
+    """
+    # Initialize variables
+    tens = 0
+    ones = n
+    
+    # Keep subtracting 10 until we can't anymore
+    # In assembly:
+    # SUB10, LDA ones
+    # ADD NEG10      ; Subtract 10 using ADD with -10
+    # SPA            ; Skip if result is positive
+    # BUN DONE       ; If negative, we're done
+    # STA ones       ; Store remaining value
+    # LDA tens
+    # INC            ; Increment tens count
+    # STA tens
+    # BUN SUB10      ; Continue subtraction loop
+    while ones >= 10:
+        ones = ones - 10
+        tens = tens + 1
+    
+    return tens, ones
+
 def multiply_by_10(n):
     # In assembly, multiplication by 10 using CIL (Circular shift left)
     # number × 10 = (number × 8) + (number × 2)
@@ -129,8 +161,16 @@ def main():
     n = get_input()
     print(f"Input number: {n}")
     
+    # Split the number to demonstrate the digit extraction
+    tens, ones = split_number(n)
+    print(f"Split into digits: {tens} and {ones}")
+    
     result = calculate_sum(n)
     print(f"Sum: {result}")
+    
+    # Split the result to show how we'll display it
+    result_tens, result_ones = split_number(result)
+    print(f"Result split into digits: {result_tens} and {result_ones}")
     
     octal = convert_to_octal(result)
     print(f"Result in octal: {octal}")

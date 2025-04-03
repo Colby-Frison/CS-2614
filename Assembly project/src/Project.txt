@@ -1,0 +1,40 @@
+ORG 100
+
+LOOPA, SKI   /loop for first input
+BUN LOOPA    /back to loop if no input
+            /BUN is skipped if input flag is triggered
+CLA         /Clear AC
+INP         /get input (10s place)
+STA NUM     /store input into NUM
+LDA NUM     /load num before operations
+ADD CON     /convert to decimal
+STA NUM     /store converted value
+
+
+LOOPB, SKI  /loops again for second digit
+BUN LOOPB   / mostly the same stuff
+
+CLA
+INP
+ADD CON     /convert first
+ADD NUM     /then add other digit
+STA NUM
+ADD REC     /convert back to ASCII
+OUT         /output num in ASCII
+HLT         /halt program
+
+
+LOOPC, LDA NUM
+ADD TEN
+SPA
+BUN DONE
+STA NUM
+LDA TENS
+
+NUM,  DEC 0
+TENS, DEC 0
+CON, DEC -48 /covnert ASCII to decimal
+REC, DEC 48  /convertt decimal to ASCII
+TEN, DEC -10 /number to seperate 10s from 1s
+HUN, DEC -100/num to seperate 100s from 10s
+    END
