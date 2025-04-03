@@ -1,5 +1,7 @@
 # Ignore practice exam PDF
-practiceExam.pdf
+# practiceExam.pdf
+# If this repo is made public again, make sure to add this ignore back
+
 
 # Common files to ignore
 *.pdf
