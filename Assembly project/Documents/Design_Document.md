@@ -1,63 +1,67 @@
 # Assembly Project Design Document
 
 ## Introduction
-For this project, I'm going to write an assembly program that does a few things: first, it takes a two-digit odd number from the user, then it adds up all the odd numbers from 1 up to that number, and finally shows the answer in octal. I know this would be pretty straightforward in a high-level language like Python or Java, but doing it in assembly is trickier since we don't have all those built-in functions and features.
+The task for this project is to **take a 2-digits odd decimal number as user input, and write an assembly program to calculate the sum of odd positive numbers up to that odd decimal number, and then display the sum in octal**. On a higher level this can be done by counting up from 1 and adding the count to sum, it will then increment by 2 until the counter is equal to the input.
 
-To make this manageable, I'm breaking it down into smaller pieces that I can tackle one at a time. This document explains my plan for how to handle each part of the problem. Since we're limited to basic assembly instructions, I'll need to figure out ways to do things like multiplication and division using just the basic operations we have available.
+Doing this in assembly introduces a lot of difficulties however, to better explain each topic I will break it into a few sections:
 
-## Breaking Down the Problem
-The main problem can be split into four main parts:
-1. Getting and processing the input
-2. Converting ASCII input to actual numbers
-3. Calculating the sum of odd numbers
-4. Converting the result to octal and displaying it
+1. The use of the assembly instructions in the problem-solving approaches
+2. How to take in and convert input character into decimal number
+3. Loop conditions for calculating the sum
+4. How to convert the result into octal number and display it
 
 ## 1. Problem-Solving Approach Using Assembly Instructions
 
-To solve this problem, I'll need to use several types of assembly instructions:
+To complete the project I will need to keep two main categories of instructions in mind:
 
-For handling memory and data:
-- Load and Store instructions to move data between memory and the accumulator
-  * Using LDA to load values and STA to store them
-- Add instructions for arithmetic
-  * ADD for addition, and adding negative numbers for subtraction
-- Branch instructions to control program flow
-  * BUN for unconditional jumps, BSA for subroutines
+### Instructions for memory and data management:
+- LDA and STA
+   - These instructions will be used to load and store data, this is needed in almost every single main operation as data is constantly being moved and altered whether it be in loops, conversion, or inputs and outputs
+- ADD, CIL, and CIR
+   - ADD will be the primary way arithmetic is done simply adding to the AC or adding a negative number to subtract. This instruction will be used in every single major operation from adding numbers to the sum to handling input and output. CIL and CIR can also theoretically be used for multiplication/division, but without having done testing I cant be 100% sure
+- BUN and BSA
+   - BUN, which is an unconditional jump, is the core instruction for looping. Because of this it is necessary to be very familiar with this as without it the loop needed to complete a lot of the major operations will not be possible. BSA is for subroutines, I'm sure there are a lot of positive applications of it, but at the moment the main operation I think is important is BUN
 
-For processing:
-- Clear instructions to reset registers
-  * CLA to clear accumulator, CLE for E bit
-- Increment instructions for counting
-  * INC to add 1, ISZ for loop control
-- Skip instructions for making decisions
-  * SPA, SNA, SZA for condition checking
-- Input/Output instructions for user interaction
-  * INP for getting input, OUT for display
+### Instructions for processing data:  
+- CLA and CLE
+   - These instructions are quite simply, just clearing the AC or E register. These operations are good to use when starting an operation, or a lot of arithmetic is done that is independent from another.
+- INC and ISZ
+   - INC seems like it would be extremely useful for looping, but in our case we are counting odd numbers only meaning we are counting by 2, so either INC could be used twice, or just add 2 using a declared variable. ISZ on the will be very useful for loops as it can track loops, which will help keep track of loops which can be useful in conversion for the output
+- SPA, SNA, and SZA
+   - All of these are also instructions that are useful in handling loops as it can skip an operation that breaks the loop, meaning it can act as a sort of if statement to make loops conditionally end
+- INP and OUT
+   - These are simple instructions for taking the input and outputting AC
 
+   
 ## 2. Input Processing and ASCII Conversion
 
 ### Getting the Input
 The program needs to:
 1. Get the first digit from input
-   * Using INP to read character
-   * Checking input flag if needed
-2. Store it somewhere in memory
-   * Using STA to save in memory
+   - Using INP to read character
+   - Convert to decimal (explained later)
+   - Multiply by 10 to put the number in the tens place
+   - Store in num
 3. Get the second digit
-4. Store it in a different memory location
+   - INP to get char
+   - convert to decimal
+   - add to num
+4. Store full number in memory for use later
 
 ### Converting from ASCII to Numbers
 When we get input characters, they're in ASCII. For example, if someone types "5", we actually get the ASCII value 53 (which is "5" in ASCII). To convert this to the actual number 5:
 1. Take the ASCII character value
-   * Using LDA to get stored value
 2. Subtract 48 (ASCII value for "0")
-   * Add -48 since we only have ADD
-3. For the first digit, multiply by 10 (will explain how in the assembly)
-   * Using CIL for multiplication
-    * Shift left three times for ×8
-    * Then add 2 times for to finish x10
-4. Add the second digit's value
-   * Using ADD after conversion
+   - Add -48 since there is no subtraction instruction
+3. For the first digit, multiply by 10 (2 ways)
+   - Using CIL
+      1. Use CIL for multiplication
+      3. Shift left 3 times for times 8
+      3. Then add to its self 2 more times to have a total of times 10
+   - Using addition
+      1. Simply add to itself 9 times to have a total of times 10
+         - Although its simpler it uses more lines and could be seen as worse
+4. for the second digit, its just adding converting and adding to sum
 
 For example:
 If input is "25":
@@ -70,41 +74,48 @@ If input is "25":
 ### How to Do Loops in Assembly
 Since assembly doesn't have while or for loops, we have to make our own using:
 1. A counter variable in memory
-   * Store using STA, update with ADD
+   -  Store using STA, update with ADD
 2. A way to change the counter (add or increment)
-   * Using ADD or INC instructions
+   - Using ADD or INC instructions
 3. A way to check if it should continue looping
-   * Using skip instructions (SPA, SNA, SZA)
+   - Using skip instructions (SPA, SNA, SZA)
 4. A way to jump back to the start of the loop
-   * Using BUN instruction
+   - Using BUN instruction
+
+This will be the basic outline of loops which will be used for calculating the sum of odd number and for converting, spiting numbers, and handling inputs.
+
+Since the sum of odd numbers is the key operation, I'll go a little more in depth on that operation.
 
 ### Loop Conditions for Sum Calculation
-For calculating the sum of odd numbers:
+This is the basic outline of how calculating the sum of odd numbers will occur using a countdown approach:
 
 Initial setup:
-- Counter starts at 1 (first odd number)
-  * Initialize using CLA and INC
+- Counter starts at input number (n)
+  * Initialize using LDA to load input
 - Sum starts at 0
   * Initialize using CLA
-- Input number is our end point
-  * Store in memory with STA
 
 Each loop iteration:
 1. Add current counter to sum
-2. Add 2 to counter (to get next odd number)
-3. Check if counter is bigger than input
-   * Add negative of input number
-   * Use SPA to check if result is positive
-4. If not bigger, go back to step 1
+2. Subtract 2 from counter (to get next odd number down)
+3. Check if counter is less than 1
+   * There are many ways to control when to skip the BUN instruction, but a good one is ISZ to check if we've reached zero or gone negative
+4. If counter >= 1, go back to step 1
    * Use BUN to return to loop start
-5. If bigger, break
+5. If counter < 1, break
 
 Example: If input is 7
-- First iteration: sum = 0 + 1 = 1, counter = 3
-- Second iteration: sum = 1 + 3 = 4, counter = 5
-- Third iteration: sum = 4 + 5 = 9, counter = 7
-- Fourth iteration: sum = 9 + 7 = 16, counter = 9
-- Counter > 7, so stop. Result is 16
+- First iteration: sum = 0 + 7 = 7, counter = 5
+- Second iteration: sum = 7 + 5 = 12, counter = 3
+- Third iteration: sum = 12 + 3 = 15, counter = 1
+- Fourth iteration: sum = 15 + 1 = 16, counter = -1
+- Counter < 1, so stop. Result is 16
+
+The task can be completed in a variety of ways, but counting down comes with a few advantages:
+1. Simpler loop control
+2. No need for complex comparison logic
+3. Natural termination when we hit 1 or go below it
+4. Produces the same result as counting up but with cleaner code
 
 ## 4. Converting to Octal and Display
 
@@ -125,7 +136,7 @@ Since we can't do division in assembly, we'll:
 1. Repeatedly subtract 8
    * Add -8 using ADD instruction
 2. Count how many times we can subtract
-   * Increment counter with INC
+   * done by incrementing counter with INC
 3. The remainder is what we couldn't subtract
    * Check using SNA for negative
 4. Convert each digit to ASCII before output
@@ -136,27 +147,12 @@ Since we can't do division in assembly, we'll:
 When we need to display a number that's more than one digit, we need to:
 1. Split the number into its digits
    - For a two-digit number:
-     * Keep subtracting 10 until we can't anymore
-     * Count how many times we subtracted (this is the tens digit)
-     * What's left is the ones digit
-2. Convert each digit to ASCII
-   - Add 48 (ASCII '0') to each digit
-3. Output the digits in order
-   - First output the tens digit
-   - Then output the ones digit
+      - Keep subtracting 10 until we can't anymore
+      - Count how many times we subtracted (this is the tens digit)
+      - What's left is the ones digit
+2. Then use the above steps to convert the decimal to octal and then the octal to ASCII
 
-Example for number 25:
-1. Split into digits:
-   - Subtract 10 twice (tens digit = 2)
-   - Remainder is 5 (ones digit)
-2. Convert to ASCII:
-   - 2 + 48 = 50 (ASCII '2')
-   - 5 + 48 = 53 (ASCII '5')
-3. Output:
-   - First OUT displays '2'
-   - Second OUT displays '5'
-
-This same approach can be extended for larger numbers by subtracting 100 for hundreds digit, etc.
+This approach can then be extended for larger numbers by subtracting 100 for hundreds digit, etc.
 
 ## 5. Program Organization
 
@@ -241,6 +237,67 @@ For each test case, I'll verify:
 This comprehensive testing approach will help ensure the program works correctly for all valid inputs and handles invalid inputs appropriately.
 
 ## Conclusion
+
+### code outline
+Here's the rough pseudo code outline of what I think the entire program will be:
+
+```
+Start Program:
+    Set up memory locations for:
+        - sum (start at 0)
+        - counter (will hold input number)
+        - temporary storage
+        - first digit
+        - second digit
+
+Input Processing:
+    Get first character from input
+    Convert from ASCII to number by subtracting 48
+    Multiply by 10 to put in tens place
+    Store as first digit
+
+    Get second character from input
+    Convert from ASCII to number by subtracting 48
+    Store as second digit
+
+    Add first and second digits together
+    Store result in counter
+
+Sum Calculation:
+    While counter is greater than or equal to 1:
+        Add counter to sum
+        Subtract 2 from counter
+        Check if counter is still valid
+        If valid, repeat loop
+
+Octal Conversion:
+    Copy sum to temporary storage
+    Set up storage for octal digits
+
+    While temporary storage is greater than 0:
+        Repeatedly subtract 8 until we can't anymore
+        Count how many times we subtracted
+        Store the count as an octal digit
+        What's left is the remainder
+        Store the remainder as next octal digit
+        Continue with the count as new number
+
+Output:
+    For each octal digit (starting from last one stored):
+        Convert digit to ASCII by adding 48
+        Output the ASCII character
+
+End Program
+```
+
+Key points about the implementation:
+1. All arithmetic operations (multiplication, division, modulo) will be implemented using repeated addition/subtraction
+2. The octal conversion will store digits in memory in reverse order
+3. The output will need to handle multiple digits by converting each to ASCII
+4. Memory management will be crucial for storing intermediate values
+5. The program will need to handle edge cases like single-digit inputs
+
+### Outlook
 After working through all the pieces of this project, I can see how breaking it down makes it much less overwhelming. Each part has its own challenges - like figuring out how to multiply by 10 without a multiply instruction, or converting to octal without division - but by solving one small problem at a time, the whole thing becomes doable.
 
 The trickiest parts will probably be the ASCII conversion and the octal display, since they involve a lot of careful memory management and bit manipulation. I'll need to test these parts thoroughly to make sure they work correctly. Even though assembly is much more basic than the high-level languages I'm used to, it's interesting to see how we can build complex operations from simple instructions.
