@@ -1,40 +1,166 @@
 ORG 100
 
-LOOPA, SKI   /loop for first input
-BUN LOOPA    /back to loop if no input
-            /BUN is skipped if input flag is triggered
-CLA         /Clear AC
-INP         /get input (10s place)
-STA NUM     /store input into NUM
-LDA NUM     /load num before operations
-ADD CON     /convert to decimal
-STA NUM     /store converted value
+LOOPA, SKI     /loop for first input
+BUN LOOPA      /back to loop if no input
+               /BUN is skipped if input flag is triggered
+    CLA        /Clear AC
+    INP        /get input (10s place)
+    ADD CON    /convert to decimal
+    STA NUM
+    LDA NUM
+
+    /x10 by adding to itself 9 times
+    ADD NUM
+    ADD NUM
+    ADD NUM
+    ADD NUM
+    ADD NUM
+    ADD NUM
+    ADD NUM
+    ADD NUM
+    ADD NUM
+    STA NUM
+
+LOOPB, SKI     /loops again for second digit
+BUN LOOPB      /mostly the same stuff
+
+    CLA
+    INP
+    ADD CON        /convert first
+    ADD NUM        /then add other digit
+    STA NUM
 
 
-LOOPB, SKI  /loops again for second digit
-BUN LOOPB   / mostly the same stuff
+/ code for odd sum
+CLA                /clear
 
-CLA
-INP
-ADD CON     /convert first
-ADD NUM     /then add other digit
-STA NUM
-ADD REC     /convert back to ASCII
-OUT         /output num in ASCII
-HLT         /halt program
+SUMLOOP, LDA SUM   /start loop load sum
+    ADD NUM        /add current odd num to sum
+    STA SUM        /store new sum
 
+    LDA NUM        /load num
+    ADD DECREMENT      /decrease by 2
+    STA NUM        /sta decremented num
+    LDA NUM        /reload num to check negative
 
-LOOPC, LDA NUM
-ADD TEN
-SPA
-BUN DONE
-STA NUM
-LDA TENS
+    SNA            /if num is < 0 skip call back to loop
+    BUN SUMLOOP
 
+/convert to octal for output
+
+/ Convert SUM to Octal
+    LDA SUM         / Load the final sum
+    STA DECIMAL     / Store it in DECIMAL for conversion
+
+/ Calculate first digit (LSB)
+    LDA DECIMAL     / Load current decimal value
+    BSA DIVIDE_BY_8 / Call division subroutine
+    LDA TEMP_REMAINDER / Load remainder
+    STA OCTAL_RESULT0 / Store as least significant octal digit
+    LDA QUOTIENT_TEMP  / Load quotient
+    STA DECIMAL     / Update decimal value
+
+/ Calculate second digit
+    LDA DECIMAL
+    BSA DIVIDE_BY_8
+    LDA TEMP_REMAINDER
+    STA OCTAL_RESULT1
+    LDA QUOTIENT_TEMP
+    STA DECIMAL
+
+/ Calculate third digit
+    LDA DECIMAL
+    BSA DIVIDE_BY_8
+    LDA TEMP_REMAINDER
+    STA OCTAL_RESULT2
+    LDA QUOTIENT_TEMP
+    STA DECIMAL
+
+/ Calculate fourth digit (MSB)
+    LDA DECIMAL     / The remaining value is the most significant digit
+    STA OCTAL_RESULT3 / Store it
+
+OUTPUT_DONE, LDA OCTAL_RESULT3 / Start with most significant digit
+    ADD CONST_48           / Convert to ASCII
+    OUT                    / Output 
+    LDA OCTAL_RESULT2      / Next digit
+    ADD CONST_48           / Convert to ASCII
+    OUT                    / Output
+    LDA OCTAL_RESULT1      / Next digit
+    ADD CONST_48           / Convert to ASCII
+    OUT                    / Output
+    LDA OCTAL_RESULT0      / Least significant digit
+    ADD CONST_48           / Convert to ASCII
+    OUT                    / Output
+    HLT                    / Halt execution
+
+/ Subroutine to divide the value in AC by 8
+/ Stores Quotient in QUOTIENT_TEMP and Remainder in TEMP_REMAINDER
+DIVIDE_BY_8, DEC 0     / Return address stored here
+    STA TEMP_VAL       / Store the number to divide (dividend)
+    CLA                / Clear AC (Quotient = 0)
+    STA QUOTIENT_TEMP  / Initialize quotient to 0
+
+DIV_LOOP, LDA TEMP_VAL     / Load current value
+    ADD NEG8           / Subtract 8
+    STA TEMP_VAL       / Store updated value
+    SPA                / Skip if positive or zero (subtraction was successful)
+    BUN DIV_DONE       / If negative, division is done
+
+    LDA QUOTIENT_TEMP  / Load quotient
+    ADD CONST_1        / Increment quotient
+    STA QUOTIENT_TEMP  / Store updated quotient
+    BUN DIV_LOOP       / Loop again
+
+DIV_DONE, LDA TEMP_VAL     / Load the negative result
+    ADD CONST_8        / Add 8 back to get the remainder
+    STA TEMP_REMAINDER / Store the remainder
+    / Quotient is already stored in QUOTIENT_TEMP
+    BUN DIVIDE_BY_8 I  / Return to caller
+
+//=============== Variables ===================
+
+/variable for taking in input
 NUM,  DEC 0
+
+/variables for output handling
 TENS, DEC 0
-CON, DEC -48 /covnert ASCII to decimal
-REC, DEC 48  /convertt decimal to ASCII
-TEN, DEC -10 /number to seperate 10s from 1s
-HUN, DEC -100/num to seperate 100s from 10s
+HUNDREDS, DEC 0
+THOUSANDS, DEC 0
+
+TEN, DEC -10          /number to separate 10s from 1s
+HUNDRED, DEC -100     /num to separate 100s from 10s
+THOUSAND, DEC -1000   /num to separate 1000s from 100s
+
+/variables to handle odd sum
+SUM, DEC 0
+DECREMENT, DEC -2
+
+/variables for ASCII conversion
+CON, DEC -48         /convert ASCII to decimal
+REC, DEC 48          /convert decimal to ASCII
+
+/Variables for octal conversion
+NEG8, DEC -8 / subtraction constant
+DECIMAL, DEC 0
+REMAINDER, DEC 0
+COUNT, DEC 0
+OCTAL_RESULT0, DEC 0  / Stores the final octal number
+OCTAL_RESULT1, DEC 0  / Stores the second digit of octal number
+OCTAL_RESULT2, DEC 0  / Stores the third digit of octal number
+OCTAL_RESULT3, DEC 0  / Stores the fourth digit of octal number
+TEMP_REMAINDER, DEC 0 / Temporary storage for remainder
+QUOTIENT_TEMP, DEC 0 / Temporary storage for quotient in subroutine
+TEMP_VAL, DEC 0      / Temporary storage for intermediate value in subroutine
+
+/Constants for conversion
+CONST_1, DEC 1
+CONST_2, DEC 2
+CONST_8, DEC 8
+CONST_48, DEC 48
+CONST_NEG4, DEC -4
+CONST_NEG1, DEC -1
+CONST_NEG2, DEC -2
+CONST_NEG3, DEC -3
+
     END

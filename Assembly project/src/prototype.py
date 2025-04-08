@@ -90,12 +90,12 @@ def calculate_sum(n):
     # Initialize using CLA and STA
     # CLA            ; Clear AC
     # STA sum        ; Initialize sum to 0
-    # LDA ONE        ; Load 1
+    # LDA n          ; Load input number
     # STA counter    ; Initialize counter
     sum = 0
-    counter = 1
+    counter = n
     
-    # Loop implementation using BUN for branching
+    # Loop implementation using ISZ for countdown
     while True:
         # Add current odd number
         # LDA sum
@@ -103,55 +103,76 @@ def calculate_sum(n):
         # STA sum
         sum = sum + counter
         
-        # Increment counter by 2
+        # Decrement counter by 2
         # LDA counter
-        # ADD TWO        ; TWO is stored as constant 2
+        # ADD NEG_TWO    ; NEG_TWO is stored as constant -2
         # STA counter
-        counter = counter + 2
+        counter = counter - 2
         
-        # Check loop condition using SPA (Skip if Positive)
-        # LDA counter
-        # ADD NEG_N      ; Add negative of input (for comparison)
-        # SPA            ; Skip next instruction if counter > n
-        # BUN LOOP       ; Branch back to loop start if counter <= n
-        if counter > n:
+        # Check loop condition using ISZ (Increment and Skip if Zero)
+        # ISZ counter    ; Decrement counter and skip if zero or negative
+        # BUN LOOP       ; Branch back to loop start if counter > 0
+        if counter < 1:
             break
     
     return sum
 
 def convert_to_octal(decimal):
-    # We'll implement octal conversion using repeated subtraction
-    quotient = decimal
-    octal = ""
+    """
+    Converts a decimal number to octal using repeated subtraction.
+    In assembly, we'll use these memory locations:
+    - AC (Accumulator): Main working register
+    - Memory locations:
+      * decimal: Input number to convert (also used as quotient)
+      * remainder: Remainder after division
+      * count: How many times we subtracted 8
+      * octal_digits: Array to store octal digits
+    """
+    # Initialize variables
+    # CLA            ; Clear AC
+    # STA count      ; Initialize count to 0
+    count = 0
+    octal_digits = []
     
-    while quotient > 0:
-        # Get remainder using repeated subtraction
-        # Uses: LDA, ADD (with negative 8), SPA, BUN
-        remainder = quotient
+    # Main conversion loop
+    # LOOP, LDA decimal
+    # SZA            ; Skip if decimal is zero
+    # BUN CONVERT    ; If not zero, continue conversion
+    # BUN END        ; If zero, we're done
+    while decimal > 0:
+        # Reset remainder and count for this digit
+        # LDA decimal
+        # STA remainder
+        # CLA
+        # STA count
+        remainder = decimal
         count = 0
         
-        # Subtraction loop
-        # SUB8, LDA remainder
-        # ADD NEG8        ; Subtract 8 using ADD with -8
-        # SPA            ; Skip if result positive
-        # BUN DONE       ; If negative, we're done
-        # STA remainder  ; Store remaining value
+        # Division by 8 using repeated subtraction
+        # DIV8, LDA remainder
+        # ADD NEG8     ; NEG8 is -8 stored in memory
+        # SPA          ; Skip if result positive
+        # BUN DONE     ; If negative, we're done
+        # STA remainder; Store new remainder
         # LDA count
-        # INC            ; Increment quotient count
+        # INC          ; Increment count
         # STA count
-        # BUN SUB8       ; Continue subtraction loop
+        # BUN DIV8     ; Continue subtraction
         while remainder >= 8:
             remainder = remainder - 8
             count = count + 1
         
-        # Convert to ASCII using ADD
+        # Store the remainder (current octal digit)
         # LDA remainder
-        # ADD ASCII0      ; Add 48 to get ASCII value
-        # OUT            ; Output the character
-        octal = str(remainder) + octal
-        quotient = count
+        # STA octal_digits,I  ; Store at current digit pointer
+        octal_digits.append(remainder)
+        
+        # Prepare for next digit
+        # LDA count
+        # STA decimal         ; New decimal is the count
+        decimal = count
     
-    return octal
+    return octal_digits
 
 # Main program flow
 def main():
