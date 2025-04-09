@@ -82,15 +82,27 @@ SUMLOOP, LDA SUM   /start loop load sum
 
 OUTPUT_DONE, LDA OCTAL_RESULT3 / Start with most significant digit
     ADD CONST_48           / Convert to ASCII
-    OUT                    / Output 
+    OUT3, SKO
+        BUN OUT3
+    OUT  
+                      / Output 
     LDA OCTAL_RESULT2      / Next digit
     ADD CONST_48           / Convert to ASCII
+
+    OUT2, SKO
+        BUN OUT2
     OUT                    / Output
     LDA OCTAL_RESULT1      / Next digit
     ADD CONST_48           / Convert to ASCII
+
+    OUT1, SKO
+        BUN OUT1
     OUT                    / Output
     LDA OCTAL_RESULT0      / Least significant digit
     ADD CONST_48           / Convert to ASCII
+
+    OUT0, SKO
+        BUN OUT0
     OUT                    / Output
     HLT                    / Halt execution
 
