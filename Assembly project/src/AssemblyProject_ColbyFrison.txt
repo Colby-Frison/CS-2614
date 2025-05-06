@@ -1,5 +1,11 @@
 ORG 100
 
+/ Name: Colby Frison
+/ OUID: 113568816
+/ Date: 4/15/2025
+/ Class: CS-2614
+/ Assignment: Assembly project ~ Part B
+
 LOOPA, SKI                  / loop for first input
 BUN LOOPA                   / back to loop if no input
                             / BUN is skipped if input flag is triggered
@@ -119,7 +125,7 @@ DIV_LOOP, LDA VALTEMP       / Load current value
     BUN DIV_DONE            / If negative, division is done
 
     LDA QUOTTEMP            / Load quotient
-    INC                     / Increment quotient
+    INC            +         / Increment quotient
     STA QUOTTEMP            / Store updated quotient
     BUN DIV_LOOP            / Loop again
 
