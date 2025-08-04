@@ -1,27 +1,56 @@
-This is everything from CS-2614 Computer organization at OU
+# CS-2614 Computer Organization – OU
 
-## Assembly
+## Overview
 
-Project changes every semester so it's not like this is helpful, but it is good to reference since theres like no reference material out there besides the textbook
+This repository contains materials, notes, and resources for CS-2614: Computer Organization at the University of Oklahoma. It is organized to help students navigate the course, review key concepts, and find solutions or references for assignments, labs, and exams.
 
-## Final review
+---
 
-This has literally everything from the course, homework solutions, quiz solutions, midterm solutions, everything. It also has a list of topics that are on teh final, but it is a good reference of what is covered in each chapter
+## Table of Contents
+
+1. [Assembly Project](#assembly-project)
+2. [Final Review](#final-review)
+3. [Homework](#homework)
+4. [Labs](#labs)
+5. [Midterm Review](#midterm-review)
+6. [Textbook](#textbook)
+
+---
+
+## Assembly Project
+
+- Description of the semester project
+- Reference materials and documentation
+- Source code and prototypes
+
+- `Documents/` - Instructions and useful resources for the project
+- `src/` - contains the assembly code, python prototyping, and the description for my code and how it works
+
+## Final Review
+
+- Comprehensive review materials
+- Homework, quiz, and midterm solutions
+- List of final exam topics
+
+- `resources/` - contains pretty much all course materials, including homeworks, quizzes, midterms, and lecture slides
+- `topics/` - contains the final topic list for the final exam
+- `review.md` - contains a comprehensive review of essentially the entire course.
 
 ## Homework
 
-Homework in this class is completion so if your going to go over the homework the solutions are in the final review.
+- Homework was largely graded by completion, so some of it may be a little lacking. Most of them are handwritten besides homework 8 where I decided to be fancy for some reason.
 
-## labs
+## Labs
 
-All labs are in here, prelab and inlab. It's a good reference if your getting started or your stuck.
+- Contains all of the pre-labs and in-lab assignment for each lab, usually going over the truth table and circuit for each lab.
 
-## Midterm review
+## Midterm Review
 
-Basically the same as the final review, but it's more condensed and focuses on the topics that are covered in the midterm.
+- Like the final review, but less since its just the midterm. Also contains the previous year's midterm, so you could use it as a practice if you really want to.
 
 ## Textbook
 
-In this course we use "Computer system architecture" 3rd edition by M. Morris Mano.
+- "Computer System Architecture" (3rd Edition) by M. Morris Mano was required for the class, the one here is a really bad example. I did'nt really use it throughout the class, but the homework came out of it, and the documentation for the version of assembly we used is pretty much exclusively available from this textbook so it is definitely needed at some point throughout the semester
+---
 
-The textbook is here as a PDF, but there is no textlayer, and some of the pictures are rough, so if you can find it physically or a better PDF use that
+Feel free to expand each section with more details, links, or instructions as needed!
